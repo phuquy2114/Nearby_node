@@ -11,11 +11,8 @@ import BaseRouter from './routes';
 import logger from '@shared/Logger';
 const multer = require('multer');
 const upload = multer();
-
 // Init express
 const app = express();
-
-
 
 /************************************************************************************
  *                              Set basic express settings
@@ -24,7 +21,17 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
-app.use(upload.none());
+
+app.use(function (req, res, next) {
+    if (req.path === '/api/v1/users/register' && req.method === 'POST') {
+        next();
+    } else {
+        upload.none()(req, res, next);
+    }
+});
+
+app.use(express.static('public'));
+
 // Show routes called in console during development
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));

@@ -6,12 +6,15 @@ import {paramMissingError} from '@shared/constants';
 import {User} from '../entity/User';
 import {Location} from '../entity/Location'
 import UserDAO from '../dao/userDAO';
-import {BaseResponse} from "../entity/BaseResponse";
+import {BaseResponse} from '../entity/BaseResponse';
+
+const fs = require('fs');
+const multer = require('multer');
+const upload = multer({dest: 'uploads/'});
 
 const userDAO: UserDAO = new UserDAO();
 // Init shared
 const router = Router();
-
 
 /******************************************************************************
  *                      Get All Users - "GET /api/users/all"
@@ -25,8 +28,12 @@ router.get('/all', async (req: Request, res: Response) => {
 /******************************************************************************
  *                       Add One - "POST /api/users/add"
  ******************************************************************************/
+const type = upload.single('avatar');
+router.post('/register', type, async (req: Request, res: Response) => {
+    console.log('ubhiuhui', req.body);
 
-router.post('/register', async (req: Request, res: Response) => {
+    console.log('huhuhuhuh', req.body.file);
+
     if (!req.body) {
         return res.status(BAD_REQUEST).json({
             error: paramMissingError,
