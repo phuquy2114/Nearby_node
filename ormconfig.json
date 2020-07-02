@@ -1,10 +1,10 @@
 {
-    "type": "postgres",
+    "type": "mysql",
     "host": "localhost",
-    "port": 5432,
-    "username": "kunkaamd",
-    "password": "locdeptraivodoi",
-    "database": "locdeptrai",
+    "port": 3306,
+    "username": "root",
+    "password": "root1234",
+    "database": "nearby",
     "synchronize": true,
     "logging": false,
     "entities": [
