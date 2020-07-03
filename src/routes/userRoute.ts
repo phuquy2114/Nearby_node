@@ -36,7 +36,12 @@ interface MulterRequest extends Request {
  ******************************************************************************/
 
 router.get('/all', async (req: Request, res: Response) => {
-    return res.status(OK).json(userDAO.getAll());
+    const data: Array<User> = await userDAO.getAll();
+    const dataResponse: BaseResponse = new BaseResponse();
+    dataResponse.status = OK;
+    dataResponse.data = data;
+    dataResponse.message = 'Successfull';
+    return res.status(OK).json(dataResponse);
 });
 
 router.get('/profile/:id', async (req: Request, res: Response) => {

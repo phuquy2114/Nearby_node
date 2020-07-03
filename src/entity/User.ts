@@ -22,10 +22,14 @@ export class User extends BaseEntity {
     @Column()
     name: string;
 
-    @Column()
+    @Column({
+        length: 20
+    })
     firstName: string;
 
-    @Column()
+    @Column({
+        length: 50
+    })
     lastName: string;
 
     @Column({length: 50})
@@ -55,6 +59,12 @@ export class User extends BaseEntity {
     @OneToOne(type => Location)
     @JoinColumn()
     location: Location;
+
+    @Column()
+    password: string;
+
+    @Column()
+    deviceToken: string;
 
     @Column({default: new Date()})
     @CreateDateColumn({name: 'created_at'}) 'created_at': Date;
