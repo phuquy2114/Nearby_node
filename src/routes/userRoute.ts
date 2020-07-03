@@ -6,30 +6,60 @@ import {paramMissingError} from '@shared/constants';
 import {User} from '../entity/User';
 import {Location} from '../entity/Location'
 import UserDAO from '../dao/userDAO';
+import LocationDAO from '../dao/locationDAO';
 import {BaseResponse} from '../entity/BaseResponse';
 
 const fs = require('fs');
 const multer = require('multer');
-const upload = multer({dest: 'uploads/'});
+const path = require('path');
+const storages = multer.diskStorage({
+    destination: (req: any, file: any, cb: any) => {
+        cb(null, 'src/public/images');
+    },
+    filename: (req: any, file: any, cb: any) => {
+        cb(null, file.originalname);
+    }
+});
+const upload = multer({storage: storages});
 
 const userDAO: UserDAO = new UserDAO();
+const locationDAO: LocationDAO = new LocationDAO();
 // Init shared
 const router = Router();
+
+interface MulterRequest extends Request {
+    file: any;
+}
 
 /******************************************************************************
  *                      Get All Users - "GET /api/users/all"
  ******************************************************************************/
 
 router.get('/all', async (req: Request, res: Response) => {
-    return res.status(OK).json({'user1': 'data'});
+    return res.status(OK).json(userDAO.getAll());
 });
 
+router.get('/profile/:id', async (req: Request, res: Response) => {
+    const {id} = req.params as ParamsDictionary;
+    const data: User = await userDAO.getUserByID(id) as User;
+
+    const dataResponse: BaseResponse = new BaseResponse();
+    dataResponse.status = OK;
+    dataResponse.data = data;
+    dataResponse.message = 'Successfull';
+    return res.status(OK).json(dataResponse);
+});
+
+router.get('/profile', async (req: Request, res: Response) => {
+    console.log(req.query);
+
+    return res.status(OK).json({"data": "data"});
+});
 
 /******************************************************************************
  *                       Add One - "POST /api/users/add"
  ******************************************************************************/
-const type = upload.single('avatar');
-router.post('/register', type, async (req: Request, res: Response) => {
+router.post('/register', upload.single('avatar'), async (req: Request, res: Response) => {
     console.log('ubhiuhui', req.body);
 
     console.log('huhuhuhuh', req.body.file);
@@ -53,10 +83,14 @@ router.post('/register', type, async (req: Request, res: Response) => {
     users.phone = req.body.phone;
     users.address = req.body.address;
 
+    console.log((req as MulterRequest).file.originalname);
+    users.avatar = (req as MulterRequest).file.originalname;
+
+
     const locations: Location = new Location();
     locations.lat = 1234567;
     locations.long = 12345678;
-    users.location = locations;
+    users.location = await locationDAO.insert(locations);
 
     const insertValue = await userDAO.insert(users);
 
@@ -83,7 +117,6 @@ router.put('/update', async (req: Request, res: Response) => {
     // updateUser
     return res.status(OK).end();
 });
-
 
 /******************************************************************************
  *                    Delete - "DELETE /api/users/delete/:id"

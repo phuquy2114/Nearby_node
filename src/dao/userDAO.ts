@@ -7,6 +7,10 @@ class UserDAO {
         return getManager().find(User);
     }
 
+    getUserByID(idParam: string) {
+        return User.findOne(idParam, {relations: ["location"]});
+    }
+
     insert(users: User) {
         return getManager().save<User>(users);
     }

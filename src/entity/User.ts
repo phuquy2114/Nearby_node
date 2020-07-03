@@ -6,13 +6,15 @@ import {
     CreateDateColumn,
     Unique,
     OneToOne,
-    JoinColumn
+    JoinColumn,
+    BaseEntity
 } from "typeorm";
 import {Location} from "./Location";
 
+
 @Entity({name: "users"})
 @Unique(['email'])
-export class User {
+export class User extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -47,7 +49,10 @@ export class User {
     @Column()
     address: string;
 
-    @OneToOne(type => Location, location => [location.long, location.lat])
+    @Column()
+    avatar: string;
+
+    @OneToOne(type => Location)
     @JoinColumn()
     location: Location;
 
