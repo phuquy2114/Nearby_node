@@ -6,7 +6,9 @@ import config from "../config/config";
 import {User} from "../entity/User";
 import AuthDAO from '../dao/authenDAO';
 import {BaseResponse} from 'src/entity/BaseResponse';
+import UserDAO from '../dao/userDAO';
 
+const userDAO: UserDAO = new UserDAO();
 const fs = require('fs-extra');
 const dataResponse: BaseResponse = new BaseResponse();
 const authenDAO: AuthDAO = new AuthDAO();
@@ -55,7 +57,39 @@ router.post('/login', async (req, res, next) => {
 
 
 //Change my password
-router.post("/change-password");
+router.post('/change-password', async (req, res, next) => {
+    //Get ID from JWT
+    const id = res.locals.jwtPayload.userId;
+
+    //Get parameters from the body
+    const { oldPassword, newPassword } = req.body;
+    if (!(oldPassword && newPassword)) {
+      res.status(400).send();
+    }
+
+    const { userId, nickName } = res.locals.jwtPayload;
+    let user: User;
+    try {
+        user = await userDAO.getUserByID(userId) as User;
+          //Check if old password matchs
+    if (!user.checkIfUnencryptedPasswordIsValid(oldPassword)) {
+        return;
+      }
+
+       //Validate de model (password lenght)
+     user.password = newPassword;
+
+     //Hash the new password and save
+    user.hashPassword();
+    const insertValue = await userDAO.insert(user);
+    
+    } catch (id) {
+      res.status(401).send();
+    }
+
+    
+
+});
 
 
 export default router;

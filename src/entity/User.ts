@@ -7,8 +7,10 @@ import {
     Unique,
     OneToOne,
     JoinColumn,
-    BaseEntity
+    BaseEntity,
+    ManyToMany, JoinTable
 } from "typeorm";
+
 import {Location} from "./Location";
 import * as bcrypt from 'bcryptjs';
 
@@ -74,10 +76,13 @@ export class User extends BaseEntity {
 
     hashPassword() {
         this.password = bcrypt.hashSync(this.password, 8);
-      }
+    }
     
-      checkIfUnencryptedPasswordIsValid(unencryptedPassword: string) {
+    checkIfUnencryptedPasswordIsValid(unencryptedPassword: string) {
         return bcrypt.compareSync(unencryptedPassword, this.password);
-      }
+    }
 
+    @ManyToMany(type => User)
+    @JoinTable()
+    friends: User[];
 }
