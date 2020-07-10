@@ -7,6 +7,7 @@ import {User} from "../entity/User";
 import AuthDAO from '../dao/authenDAO';
 import {BaseResponse} from 'src/entity/BaseResponse';
 
+const fs = require('fs-extra');
 const dataResponse: BaseResponse = new BaseResponse();
 const authenDAO: AuthDAO = new AuthDAO();
 // Init shared
@@ -31,16 +32,30 @@ router.post('/login', async (req, res, next) => {
         dataResponse.message = 'Tài khoản không tồn tại';
         return res.status(400).send(dataResponse);
     }
+
     console.log(user);
 
-    //Sing JWT, valid for 1 hour
-    const token = jwt.sign(
-        {userId: user.id, nickname: user.nickName},
-        config.jwtSecret,
-        {expiresIn: "1h"}
-    );
+    //Check if encrypted password match
+    if (!user.checkIfUnencryptedPasswordIsValid(password)) {
+        res.status(401).send();
+        return;
+      }
 
+      
+    //Sing JWT, valid for 1 hour
+    const token = jwt. sign({userId: user.id, nickname: user.nickName}, config.jwtSecret,
+        { expiresIn: "10h" });
+       
     console.log(token);
+    dataResponse.status = 200;
+    dataResponse.data = {"token" : token , "user" : user };
+    dataResponse.message = 'Successfull';
+    return res.status(OK).json(dataResponse);
 });
+
+
+//Change my password
+router.post("/change-password");
+
 
 export default router;

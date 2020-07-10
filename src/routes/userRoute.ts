@@ -8,6 +8,7 @@ import {Location} from '../entity/Location'
 import UserDAO from '../dao/userDAO';
 import LocationDAO from '../dao/locationDAO';
 import {BaseResponse} from '../entity/BaseResponse';
+import { checkJwt } from "../middlewares/checkJwt";
 
 const fs = require('fs');
 const multer = require('multer');
@@ -37,6 +38,17 @@ interface MulterRequest extends Request {
 
 router.get('/all', async (req: Request, res: Response) => {
     const data: Array<User> = await userDAO.getAll();
+    const dataResponse: BaseResponse = new BaseResponse();
+    dataResponse.status = OK;
+    dataResponse.data = data;
+    dataResponse.message = 'Successfull';
+    return res.status(OK).json(dataResponse);
+});
+
+router.get('/me',[checkJwt],async (req: Request, res: Response) => {
+    const { userId, nickName } = res.locals.jwtPayload;
+    const data: User = await userDAO.getUserByID(userId) as User;
+
     const dataResponse: BaseResponse = new BaseResponse();
     dataResponse.status = OK;
     dataResponse.data = data;
@@ -83,19 +95,25 @@ router.post('/register', upload.single('avatar'), async (req: Request, res: Resp
     users.birthDay = req.body.birthDay;
     users.email = req.body.email;
     users.nickName = req.body.nickName;
-    users.age = 30;
-    users.phoneCode = '+84';
+    users.age = req.body.age;
+    users.phoneCode = req.body.phoneCode;
     users.phone = req.body.phone;
     users.address = req.body.address;
+    users.password = req.body.password;
+    users.deviceToken = req.body.deviceToken;
 
     console.log((req as MulterRequest).file.originalname);
     users.avatar = (req as MulterRequest).file.originalname;
 
 
     const locations: Location = new Location();
-    locations.lat = 1234567;
-    locations.long = 12345678;
+    locations.lat = req.body.lat;
+    locations.long = req.body.long;
+
     users.location = await locationDAO.insert(locations);
+
+      //Hash the password, to securely store on DB
+    users.hashPassword();
 
     const insertValue = await userDAO.insert(users);
 

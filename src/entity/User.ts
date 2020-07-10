@@ -10,10 +10,10 @@ import {
     BaseEntity
 } from "typeorm";
 import {Location} from "./Location";
-
+import * as bcrypt from 'bcryptjs';
 
 @Entity({name: "users"})
-@Unique(['email'])
+@Unique(['email','nickName'])
 export class User extends BaseEntity {
 
     @PrimaryGeneratedColumn()
@@ -42,7 +42,7 @@ export class User extends BaseEntity {
     age: number;
 
     @Column()
-    nickName: string;
+    nickName!: string;
 
     @Column({name: "phone_code"})
     phoneCode: string;
@@ -71,5 +71,13 @@ export class User extends BaseEntity {
 
     @Column({default: new Date()})
     @UpdateDateColumn({name: 'updated_at'}) 'updated_at': Date;
+
+    hashPassword() {
+        this.password = bcrypt.hashSync(this.password, 8);
+      }
+    
+      checkIfUnencryptedPasswordIsValid(unencryptedPassword: string) {
+        return bcrypt.compareSync(unencryptedPassword, this.password);
+      }
 
 }
