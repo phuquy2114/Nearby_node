@@ -1,4 +1,4 @@
-import {Request, Response, Router} from 'express';
+import {Request, Response, Router, NextFunction} from 'express';
 import {BAD_REQUEST, CREATED, OK} from 'http-status-codes';
 import {ParamsDictionary} from 'express-serve-static-core';
 import * as jwt from 'jsonwebtoken';
@@ -7,6 +7,7 @@ import {User} from "../entity/User";
 import AuthDAO from '../dao/authenDAO';
 import {BaseResponse} from 'src/entity/BaseResponse';
 import UserDAO from '../dao/userDAO';
+import { checkJwt } from "../middlewares/checkJwt";
 
 const userDAO: UserDAO = new UserDAO();
 const fs = require('fs-extra');
@@ -57,23 +58,26 @@ router.post('/login', async (req, res, next) => {
 
 
 //Change my password
-router.post('/change-password', async (req, res, next) => {
-    //Get ID from JWT
-    const id = res.locals.jwtPayload.userId;
+router.post('/change-password',[checkJwt], async (req : Request, res : Response, next : NextFunction) => {
 
     //Get parameters from the body
     const { oldPassword, newPassword } = req.body;
-    if (!(oldPassword && newPassword)) {
-      res.status(400).send();
-    }
 
+    if (!(oldPassword && newPassword)) {
+      res.status(400).send({});
+    }
+    //Get ID from JWT
     const { userId, nickName } = res.locals.jwtPayload;
     let user: User;
     try {
         user = await userDAO.getUserByID(userId) as User;
           //Check if old password matchs
     if (!user.checkIfUnencryptedPasswordIsValid(oldPassword)) {
-        return;
+        dataResponse.status = OK;
+        dataResponse.data = {};
+        dataResponse.message = 'Mật khẩu củ không đúng ';
+    
+        return res.status(400).send(dataResponse);
       }
 
        //Validate de model (password lenght)
@@ -82,13 +86,17 @@ router.post('/change-password', async (req, res, next) => {
      //Hash the new password and save
     user.hashPassword();
     const insertValue = await userDAO.insert(user);
+    dataResponse.status = OK;
+    dataResponse.data = user;
+    dataResponse.message = 'Success';
+    return res.status(OK).send(dataResponse);
     
     } catch (id) {
-      res.status(401).send();
+        dataResponse.status = OK;
+        dataResponse.data = {};
+        dataResponse.message = 'Mật khẩu củ không đúng ';
+        return res.status(400).send(dataResponse);
     }
-
-    
-
 });
 
 
