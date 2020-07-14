@@ -7,6 +7,10 @@ class UserDAO {
         return getManager().find(User);
     }
 
+    getListMyFriend(idParam: string){
+        return User.findOne(idParam, {relations: ["friends"]});
+    }
+
     getUserByID(idParam: string) {
         return User.findOne(idParam, {relations: ["location"]});
     }

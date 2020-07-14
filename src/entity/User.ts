@@ -21,6 +21,7 @@ export class User extends BaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
+
     @Column()
     name: string;
 
@@ -36,6 +37,9 @@ export class User extends BaseEntity {
 
     @Column({length: 50})
     email!: string;
+
+    @Column({type: "int", width: 4})
+    code: number;
 
     @Column({name: "birth_day"})
     birthDay: string;
