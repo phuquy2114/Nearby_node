@@ -1,5 +1,5 @@
-import {getManager} from "typeorm"
-import {User} from "../entity/User";
+import { getManager } from "typeorm"
+import { User } from "../entity/User";
 
 class UserDAO {
 
@@ -7,12 +7,16 @@ class UserDAO {
         return getManager().find(User);
     }
 
-    getListMyFriend(idParam: string){
-        return User.findOne(idParam, {relations: ["friends"]});
+    getListMyFriend(idParam: string) {
+        return User.findOne(idParam, { relations: ["friends"] });
     }
 
     getUserByID(idParam: string) {
-        return User.findOne(idParam, {relations: ["location"]});
+        return User.findOne(idParam, { relations: ["location"] });
+    }
+
+    update(user: User) {
+        return User.update(user.id, user);
     }
 
     insert(users: User) {

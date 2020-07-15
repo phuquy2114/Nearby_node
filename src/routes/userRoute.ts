@@ -101,6 +101,7 @@ router.post('/register', upload.single('avatar'), async (req: Request, res: Resp
     users.address = req.body.address;
     users.password = req.body.password;
     users.deviceToken = req.body.deviceToken;
+    users.code = 1111;
 
     console.log((req as MulterRequest).file.originalname);
     users.avatar = (req as MulterRequest).file.originalname;
@@ -129,13 +130,25 @@ router.post('/register', upload.single('avatar'), async (req: Request, res: Resp
  *                       Update - "PUT /api/users/update"
  ******************************************************************************/
 
-router.put('/update', async (req: Request, res: Response) => {
-    const {user} = req.body;
+router.put('/update',[checkJwt], async (req: Request, res: Response) => {
+    const { userId, nickName } = res.locals.jwtPayload;
+    var user: User;
+
+    try {
+        user = await userDAO.getUserByID(userId) as User;
+    } catch (error) {
+           //If not found, send a 404 response
+    res.status(404).send("User not found");
+    return;
+    }
+ 
+
     if (!user) {
         return res.status(BAD_REQUEST).json({
             error: paramMissingError,
         });
     }
+    
     user.id = Number(user.id);
     // updateUser
     return res.status(OK).end();
