@@ -1,4 +1,4 @@
-import { getManager } from "typeorm"
+import { getManager, getConnection } from "typeorm"
 import { User } from "../entity/User";
 
 class UserDAO {
@@ -12,6 +12,10 @@ class UserDAO {
     }
 
     getUserByID(idParam: string) {
+        return User.findOne(idParam, { relations: ["location", "friends"] });
+    }
+
+    getUserByIDNotFriend(idParam: string) {
         return User.findOne(idParam, { relations: ["location"] });
     }
 
@@ -23,6 +27,9 @@ class UserDAO {
         return getManager().save<User>(users);
     }
 
+    getUnfriend(idParam: string) {
+
+    }
 }
 
 export default UserDAO;

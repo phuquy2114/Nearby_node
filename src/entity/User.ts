@@ -11,16 +11,15 @@ import {
     ManyToMany, JoinTable
 } from "typeorm";
 
-import {Location} from "./Location";
+import { Location } from "./Location";
 import * as bcrypt from 'bcryptjs';
 
-@Entity({name: "users"})
-@Unique(['email','nickName'])
+@Entity({ name: "users" })
+@Unique(['email', 'nickName'])
 export class User extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id: number;
-
 
     @Column()
     name: string;
@@ -35,13 +34,13 @@ export class User extends BaseEntity {
     })
     lastName: string;
 
-    @Column({length: 50})
+    @Column({ length: 50 })
     email!: string;
 
-    @Column({type: "int", width: 4})
+    @Column({ type: "int", width: 4 })
     code: number;
 
-    @Column({name: "birth_day"})
+    @Column({ name: "birth_day" })
     birthDay: string;
 
     @Column()
@@ -50,7 +49,7 @@ export class User extends BaseEntity {
     @Column()
     nickName!: string;
 
-    @Column({name: "phone_code"})
+    @Column({ name: "phone_code" })
     phoneCode: string;
 
     @Column()
@@ -72,21 +71,21 @@ export class User extends BaseEntity {
     @Column()
     deviceToken: string;
 
-    @Column({default: new Date()})
-    @CreateDateColumn({name: 'created_at'}) 'created_at': Date;
+    @Column({ default: new Date() })
+    @CreateDateColumn({ name: 'created_at' }) 'created_at': Date;
 
-    @Column({default: new Date()})
-    @UpdateDateColumn({name: 'updated_at'}) 'updated_at': Date;
+    @Column({ default: new Date() })
+    @UpdateDateColumn({ name: 'updated_at' }) 'updated_at': Date;
 
     hashPassword() {
         this.password = bcrypt.hashSync(this.password, 8);
     }
-    
+
     checkIfUnencryptedPasswordIsValid(unencryptedPassword: string) {
         return bcrypt.compareSync(unencryptedPassword, this.password);
     }
 
-    @ManyToMany(type => User)
+    @ManyToMany(type => User, { cascade: true })
     @JoinTable()
     friends: User[];
 }
