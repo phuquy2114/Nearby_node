@@ -25,12 +25,11 @@ router.get('/getFriend', [checkJwt], async (req: Request, res: Response, next: N
         dataResponse.message = 'fail';
         return res.status(401).json(dataResponse);
     }
-    var query: string = `select * from (
-        SELECT  *,( 3959 * acos( cos( radians(6.414478) ) * cos( radians( ${lat} ) ) * cos( radians( ${lng} ) 
-        - radians(12.466646) ) + sin( radians(6.414478) ) * sin( radians( ${lat} ) ) ) ) AS distance FROM users) al
-        where distance < 5
-        ORDER BY distance
-        LIMIT 20;`;
+    var query: string = `select *,SQRT(
+        POW(69.1 * (locations.lat - ${lat}), 2) +
+        POW(69.1 * (${lng} - locations.long) * COS(locations.lat / 57.3), 2)) AS distance 
+        FROM users inner join locations on users.locationId = locations.id 
+        HAVING distance < 100 ORDER BY distance`;
     
     var result = await getManager().query(query);
     

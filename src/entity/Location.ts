@@ -6,9 +6,9 @@ export class Location {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ type: "double"})
     long: number;
 
-    @Column()
+    @Column({ type: "double"})
     lat: number;
 }
