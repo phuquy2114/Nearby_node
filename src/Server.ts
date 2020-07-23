@@ -6,7 +6,7 @@ import helmet from 'helmet';
 import express, { Request, Response, NextFunction } from 'express';
 import { BAD_REQUEST } from 'http-status-codes';
 import 'express-async-errors';
-
+import {pagination} from 'typeorm-pagination'
 import BaseRouter from './routes';
 import logger from '@shared/Logger';
 const multer = require('multer');
@@ -21,6 +21,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
+app.use(pagination);
 
 app.use(function (req, res, next) {
     if (req.path === '/api/v1/users/register' && req.method === 'POST') {

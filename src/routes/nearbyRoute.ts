@@ -6,7 +6,7 @@ import UserDAO from '../dao/userDAO';
 import { BaseResponse } from '../entity/BaseResponse';
 import { checkJwt } from "../middlewares/checkJwt";
 import { getManager } from 'typeorm';
-
+import {pagination} from 'typeorm-pagination'
 
 const userDAO: UserDAO = new UserDAO();
 const dataResponse: BaseResponse = new BaseResponse();
@@ -29,7 +29,7 @@ router.get('/getFriend', [checkJwt], async (req: Request, res: Response, next: N
         POW(69.1 * (locations.lat - ${lat}), 2) +
         POW(69.1 * (${lng} - locations.long) * COS(locations.lat / 57.3), 2)) AS distance 
         FROM users inner join locations on users.locationId = locations.id 
-        HAVING distance < 100 ORDER BY distance`;
+        HAVING distance < 25 ORDER BY distance`;
     
     var result = await getManager().query(query);
     

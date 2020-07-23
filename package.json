@@ -49,6 +49,7 @@
     "mysql2": "^2.1.0",
     "pg": "^8.2.1",
     "typeorm": "^0.2.25",
+    "typeorm-pagination": "^2.0.1",
     "winston": "^3.3.3"
   },
   "devDependencies": {
