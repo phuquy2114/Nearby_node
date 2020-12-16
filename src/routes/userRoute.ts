@@ -69,7 +69,6 @@ router.get('/profile/:id', async (req: Request, res: Response) => {
 
 router.get('/profile', async (req: Request, res: Response) => {
     console.log(req.query);
-
     return res.status(OK).json({ "data": "data" });
 });
 

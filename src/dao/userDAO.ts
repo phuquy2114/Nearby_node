@@ -4,7 +4,7 @@ import { User } from "../entity/User";
 class UserDAO {
 
     getAll() {
-        return getManager().find(User);
+        return getManager().find(User,{ relations: ["location"] });
     }
 
     getListMyFriend(idParam: string) {

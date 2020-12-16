@@ -40,8 +40,10 @@ router.post('/login', async (req, res, next) => {
 
     //Check if encrypted password match
     if (!user.checkIfUnencryptedPasswordIsValid(password)) {
-        res.status(401).send();
-        return;
+        dataResponse.status = 401;
+        dataResponse.data = {};
+        dataResponse.message = 'Sai mật khẩu';
+        return res.status(401).send(dataResponse);
       }
 
       

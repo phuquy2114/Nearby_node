@@ -4,7 +4,7 @@ import {User} from "../entity/User";
 class AuthenDAO {
 
     loginUser(email: string) {
-        return User.findOne({'email': email});
+        return User.findOne({'email': email},{ relations: ["location"] });
     }
 
     forgetPassword(email: string) {
